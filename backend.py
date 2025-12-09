@@ -79,7 +79,8 @@ def title_of_article(url):
     return url[36: -2]
 
 def gather_winning_numbers(url: str, df: pd.DataFrame, wins: dict):
-    keys = wins.keys()
+    keys = list(wins.keys())
+    keys.remove("Datum")
     for row, number in enumerate(df.iloc[:, 2]):
         # Ensure that no errors emerge!
         try:
@@ -103,7 +104,6 @@ def main_current_day(relevant_urls: list[str], entry: int = 0): # <-- selected d
     }
     url = relevant_urls[entry]
     df = get_table(url)
-    print("raw extracted table:\n", df)
     df = fix_table(df)
 
     print("fixed extracted table:\n", df)
