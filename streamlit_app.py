@@ -51,18 +51,16 @@ if not st.session_state["all_days"]:
     if st.button("🔍 Heutigen Tag auswerten", type="primary"):
         wins, failed_extractions = main_current_day(st.session_state["relevant_urls"])
 
-        if wins is None:
+        if failed_extractions is not None:
+            st.error("Die Extraktion war heute nicht erfolgreich.")
+            st.write(f"**Titel:** {failed_extractions['Titel']}")
+            st.write(f"**Betroffene URL:** {failed_extractions['Url']}")
+        elif wins is None:
             st.warning("Keine Nummer hat heute gewonnen.")
         else:
             num_of_wins = wins.shape[0]
             st.success(f"🎉 Glückwunsch! Du hast **{num_of_wins} Preise** gewonnen!")
             st.table(wins)
-
-        if failed_extractions is not None:
-            st.error("Die Extraktion war heute nicht erfolgreich.")
-            st.write(f"**Titel:** {failed_extractions['Titel']}")
-            st.write(f"**Betroffene URL:** {failed_extractions['Url']}")
-
 
 # --- All Days Mode -----------------------------------------------------------
 else:
@@ -79,9 +77,7 @@ else:
             st.success(f"🎉 Insgesamt wurden **{num_of_wins} Gewinne** erzielt!")
             st.table(wins)
 
-        if failed_extractions is None:
-            st.success("Alle Tage konnten erfolgreich ausgewertet werden.")
-        else:
+        if failed_extractions is not None:
             st.error("Bei folgenden Tagen gab es Fehler:")
             st.table(failed_extractions)
             st.info("Bitte überprüfe diese URLs manuell.")
