@@ -50,10 +50,13 @@ def get_table(url):
         return df
 
 def fix_table(df):
+    if df is None:
+        return None
+    elif df.shape[1] != 3:
+        return None # <-- Returns None if the shape is corrupted
+    
     expected_col_names = ["Sponsor", "Gewinn", "Gewinnzahl"]
     first_row = df.iloc[0, :].values.tolist() #different syntax due to np array
-    if df.shape[1] != 3:
-        return None # <-- Returns None if the shape is corrupted
     
     print(first_row)
     if first_row == expected_col_names:
@@ -106,8 +109,6 @@ def main_current_day(relevant_urls: list[str], entry: int = 0): # <-- selected d
     df = get_table(url)
     df = fix_table(df)
 
-    print("fixed extracted table:\n", df)
-
     if df is None: # -> e.g. extraction failed
         german_date = get_date(url)
         title = title_of_article(url)
@@ -139,6 +140,7 @@ def main_all_days(relevant_urls):
     }
     for url in relevant_urls:
         df = get_table(url)
+        df = fix_table(df)
         if df is not None:
             gather_winning_numbers(url, df, wins)
         else:
@@ -163,3 +165,6 @@ if __name__ == "__main__":
     relevant_urls = get_urls()
     main_current_day(relevant_urls)
     pass
+    # Changes can be simply pushed via:
+    # git push
+    # It is already linked to the github repos
