@@ -12,24 +12,36 @@ def get_urls():
     Gets all the urls for the winning number tables.
     First url corresponds to the current day, last url to 01.12.2025.
     """
-    url = "https://lionshorbsulz.de/"
+    urls = []
+    base_url = "https://lionshorbsulz.de/tag/adventskalender/"
+    extract_url(urls, base_url)
+
+    stop_url = "https://lionshorbsulz.de/2025/12/01/die-ersten-gewinnzahlen-2025/"
+    page_num = 2
+    while True:
+        new_page_url = f"https://lionshorbsulz.de/tag/adventskalender/page/{page_num}/"
+        extract_url(urls, new_page_url)
+        if stop_url in urls:
+            break
+        else:
+            page_num += 1 
+    relevant_urls= filter_urls(urls, stop_url)
+    return relevant_urls
+
+def extract_url(urls: list[str], url: str):
     response = requests.get(url) 
     soup = BeautifulSoup(response.text, 'html.parser')
     headers = soup.find_all('header', class_="entry-header") 
-    urls = []
     for header in headers:
         a = header.find("a")  # first <a> inside the header
         if a and a.get("href"):
             urls.append(a["href"])
-    relevant_urls = filter_urls(urls)
-    return relevant_urls
 
-def filter_urls(urls: list[str]):
+def filter_urls(urls: list[str], stop_url):
     """
     Slices the list of urls, so that the last url is from the 01.12.2025.
     """
-    start_url = "https://lionshorbsulz.de/2025/12/01/die-ersten-gewinnzahlen-2025/"
-    stop_index = urls.index(start_url) + 1
+    stop_index = urls.index(stop_url) + 1
     relevant_urls = urls[0: stop_index]
     return relevant_urls
 
